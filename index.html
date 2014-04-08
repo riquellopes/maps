@@ -1,0 +1,125 @@
+<html>
+<head>
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+	<meta charset="utf-8">
+	<style>
+		html, body, #map-canvas{
+			height: 100%;
+			margin: 0px;
+			padding: 0px
+		}
+		.gm-style-iw + div{
+			display:none;
+		}
+	</style>
+	<script src='https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false' type='text/javascript'></script>
+	<script src='data.js' type='text/javascript'></script>
+	<script>
+		/***
+		 * var map = HuMaps({lat:-33.9, lng:151.2});
+		 * 	   map.addHotel({
+		 *			name:'Copacabana palace',
+		 *          price:150,
+		 *          currency:'R$',
+		 *          star:5,
+		 *			address:'Rua sem nome',
+		 *			thumb:'',
+		 * 			url:'',
+		 * 			neighborhood:'Copacabana',
+		 * 			lat:0001,
+		 * 			lng:0002
+		 *	   });
+		 * 
+		 * 	  or
+		 *    
+		 * 	  map.loadData();
+		 *
+		 *    map.run();
+		 */
+		function init(){
+			
+			var mapOptions = {
+				zoom:10,
+				/**
+				 * Foco principal do mapa:
+				 */
+				center:new google.maps.LatLng(-33.9, 151.2),
+				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				scaleControl:false,
+				//panControl:false,
+				//zoomControl:false,
+				streetViewControl:false,
+				mapTypeControl:false
+			}
+			
+			/**
+			 * Iniciar map, com geo de inicialização.
+			 */
+			var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+			setMarkers(map, hotel);
+		}
+		
+		google.maps.InfoWindow.prototype.toolTip = function(options){
+			this.setContent("Maps<br />".concat(options.self.title).concat("<br />").concat(options.self.id));
+			this.open(options.map, options.self);
+		}
+		
+		google.maps.InfoWindow.prototype.goToDetail=function(){
+			console.log(this);
+		}
+		
+		function setMarkers(map, hotel, info){
+			var image = {
+				/**
+				 * Icone default do HU.
+				 */
+				url: 'images/beachflag.png',
+				size:new google.maps.Size(20, 32),
+				origin:new google.maps.Point(0,0),
+				anchor: new google.maps.Point(0,32)
+			}
+			
+			var shape = {
+				coord:[10, 1, 1, 20, 18, 20, 18 , 1],
+				type:'poly'
+			}
+			
+			for(var i=0, length=hotel.length; i<length; i++){
+				var h = hotel[i];
+				var hotelLatLng = new google.maps.LatLng(h[1], h[2]);
+				var marker = new google.maps.Marker({
+					position:hotelLatLng,
+					map:map,
+					shape:shape,
+					title:h[0],
+					zIndex:h[3],
+					id:i
+				});
+				
+				var info = new google.maps.InfoWindow();
+					
+				google.maps.event.addListener(marker, 'click', function(){
+					info.goToDetail();
+				});
+				
+				google.maps.event.addListener(marker, 'mouseover', function(){
+					info.toolTip({
+						self:this,
+						map:map
+					});
+					//console.log( document.querySelector('.gm-style-iw') )
+				});
+				
+				google.maps.event.addListener(marker, 'mouseout', function(){
+					info.close(map, this);
+				})
+			}
+		}
+		
+		google.maps.event.addDomListener(window, 'load', init);
+	</script>
+</head>
+<body>
+	<div id="map-canvas"></div>
+</body>		
+</html>
