@@ -1,0 +1,1 @@
+http://maps.googleapis.com/maps/api/staticmap?center=-22.9037207699828%2c-43.3003599196672&zoom=9&size=244x150&sensor=false&language=pt-br
